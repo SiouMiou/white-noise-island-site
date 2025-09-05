@@ -2,7 +2,6 @@
 
 // 全域錯誤處理組件
 export default function Error({
-  error,
   reset,
 }: {
   error: Error & { digest?: string }

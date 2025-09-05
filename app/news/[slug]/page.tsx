@@ -10,8 +10,17 @@ export const revalidate = 60
 type NewsDetail = {
   title: string
   publishedAt: string
-  coverImage?: any
-  body?: any[]
+  coverImage?: {
+    asset: {
+      _ref: string
+      _type: string
+    }
+    alt?: string
+  }
+  body?: Array<{
+    _type: string
+    [key: string]: unknown
+  }>
 }
 
 export async function generateStaticParams() {
