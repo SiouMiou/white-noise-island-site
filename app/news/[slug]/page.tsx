@@ -30,12 +30,13 @@ export async function generateStaticParams() {
   return slugs.map(s => ({slug: s.slug.current}))
 }
 
-export default async function NewsPage({params}: {params: {slug: string}}) {
+export default async function NewsPage({params}: {params: Promise<{slug: string}>}) {
+  const {slug} = await params
   const data = await sanityClient.fetch<NewsDetail | null>(
     `*[_type == "news" && slug.current == $slug][0]{
       title, publishedAt, coverImage, body
     }`,
-    {slug: params.slug}
+    {slug}
   )
 
   if (!data) return notFound()
