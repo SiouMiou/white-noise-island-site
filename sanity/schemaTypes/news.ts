@@ -43,7 +43,27 @@ export default defineType({
       name: 'body',
       title: '內文',
       type: 'array',
-      of: [{type: 'block'}, {type: 'image'}]
+      of: [
+        {type: 'block'},
+        {
+          type: 'image',
+          options: {hotspot: true},
+          fields: [
+            {
+              name: 'alt',
+              title: 'Alt 文字',
+              type: 'string',
+              description: '圖片的替代文字，用於無障礙和 SEO'
+            },
+            {
+              name: 'caption',
+              title: '圖片說明',
+              type: 'string',
+              description: '圖片下方顯示的說明文字'
+            }
+          ]
+        }
+      ]
     }),
   ],
   preview: {

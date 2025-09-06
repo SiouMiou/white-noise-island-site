@@ -5,6 +5,7 @@ import {PortableText} from '@portabletext/react'
 import {sanityClient} from '../../../lib/sanity.client'
 import {urlFor} from '../../../lib/sanity.image'
 import {formatTWT} from '../../../lib/formatDate'
+import {ptComponents} from '../../../lib/portableText'
 
 export const revalidate = 60
 
@@ -43,7 +44,16 @@ export default async function NewsPage({params}: {params: Promise<{slug: string}
   try {
     data = await sanityClient.fetch<NewsDetail | null>(
       `*[_type == "news" && slug.current == $slug][0]{
-        title, publishedAt, coverImage, body
+        title, publishedAt, coverImage, 
+        body[]{
+          ...,
+          _type == "image" => {
+            ...,
+            asset->,
+            alt,
+            caption
+          }
+        }
       }`,
       {slug}
     )
@@ -81,7 +91,7 @@ export default async function NewsPage({params}: {params: Promise<{slug: string}
 
       {data.body && (
         <article className="prose prose-lg max-w-none dark:prose-invert">
-          <PortableText value={data.body} />
+          <PortableText value={data.body} components={ptComponents} />
         </article>
       )}
 
