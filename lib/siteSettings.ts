@@ -3,6 +3,7 @@ import {sanityClient} from './sanity.client'
 export type SiteSettings = {
   title: string
   description?: string
+  useSvgAnimation?: boolean
   logo?: {
     asset: {
       _ref: string
@@ -27,6 +28,7 @@ export type SiteSettings = {
       _ref: string
       _type: string
     }
+    alt?: string
   }
   contactEmail?: string
   socialLinks?: {
@@ -39,6 +41,7 @@ export type SiteSettings = {
 const siteSettingsQuery = `*[_type == "siteSettings"][0]{
   title,
   description,
+  useSvgAnimation,
   logo,
   favicon,
   defaultCoverImage,

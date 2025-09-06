@@ -6,6 +6,7 @@ import {urlFor} from '../lib/sanity.image'
 import {formatTWT} from '../lib/formatDate'
 import {getSiteSettings} from '../lib/siteSettings'
 import BannerCarousel from '../components/BannerCarousel'
+import LogoAnimation from '../components/LogoAnimation'
 
 export const revalidate = 60 // ISR：每 60 秒再驗證
 
@@ -89,8 +90,10 @@ export default async function HomePage() {
         <div className="mx-auto max-w-6xl px-4 py-10 sm:py-14">
           <div className="relative overflow-hidden rounded-2xl border bg-white dark:bg-gray-800 shadow-lg">
             {/* 品牌 LOGO 動畫 */}
-            <div className="relative h-[220px] sm:h-[300px] md:h-[360px]">
-              {siteSettings?.logo ? (
+            <div className="relative h-[220px] sm:h-[300px] md:h-[360px] bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900">
+              {siteSettings?.useSvgAnimation !== false ? (
+                <LogoAnimation />
+              ) : siteSettings?.logo ? (
                 <Image
                   src={urlFor(siteSettings.logo).width(1200).height(360).fit('crop').url()}
                   alt={siteSettings.logo.alt || `${siteSettings.title} LOGO`}
@@ -100,9 +103,7 @@ export default async function HomePage() {
                   style={{ objectFit: 'cover' }}
                 />
               ) : (
-                <div className="flex items-center justify-center h-full bg-gray-100 dark:bg-gray-700">
-                  <span className="text-gray-500 dark:text-gray-400">請在 Sanity 後台設定 LOGO</span>
-                </div>
+                <LogoAnimation />
               )}
             </div>
             <div className="border-t px-6 py-4 text-sm text-gray-600 dark:text-gray-400">

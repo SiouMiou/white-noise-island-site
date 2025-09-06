@@ -22,10 +22,17 @@ export default defineType({
       initialValue: '以日系簡約風格呈現的企劃官網'
     }),
     defineField({
+      name: 'useSvgAnimation',
+      title: '使用 SVG 動畫 LOGO',
+      type: 'boolean',
+      description: '啟用後會顯示 SVG 動畫 LOGO，而不是上傳的圖片',
+      initialValue: true,
+    }),
+    defineField({
       name: 'logo',
-      title: '品牌 LOGO 動畫',
+      title: '品牌 LOGO 圖片',
       type: 'image',
-      description: '首頁展示的大型 LOGO 動畫 (建議 GIF 格式)',
+      description: '首頁展示的 LOGO 圖片 (當不使用 SVG 動畫時)',
       options: {
         hotspot: true
       },
@@ -36,7 +43,8 @@ export default defineType({
           type: 'string',
           description: 'LOGO 的替代文字'
         }
-      ]
+      ],
+      hidden: ({document}) => document?.useSvgAnimation === true,
     }),
     defineField({
       name: 'favicon',
@@ -63,7 +71,15 @@ export default defineType({
       description: '在社群媒體分享時顯示的圖片',
       options: {
         hotspot: true
-      }
+      },
+      fields: [
+        {
+          name: 'alt',
+          title: 'Alt 文字',
+          type: 'string',
+          description: '圖片的替代文字，用於無障礙和 SEO'
+        }
+      ]
     }),
     defineField({
       name: 'contactEmail',
