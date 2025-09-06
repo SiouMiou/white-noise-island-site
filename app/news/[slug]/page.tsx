@@ -1,117 +1,111 @@
-// app/news/[slug]/page.tsx
-import type { Metadata } from 'next'
 import Image from 'next/image'
-import { notFound } from 'next/navigation'
-import { PortableText } from '@portabletext/react'
+import Link from 'next/link'
+import {notFound} from 'next/navigation'
+import {PortableText} from '@portabletext/react'
+import {sanityClient} from '../../../lib/sanity.client'
+import {urlFor} from '../../../lib/sanity.image'
+import {formatTWT} from '../../../lib/formatDate'
+import {ptComponents} from '../../../lib/portableText'
 
-import { sanityClient } from '@/lib/sanity.client'
-import { newsQuery, newsBySlugQuery } from '@/lib/queries'
-import { urlForImage } from '@/lib/sanity.image'
-import { formatDate } from '@/lib/formatDate'
-// 若你有型別檔可開啟：
-// import type { News } from '@/types/news'
+export const revalidate = 60
 
-export const revalidate = 60 // ISR：每 60 秒再驗證
-
-type Params = { slug: string }
-
-// 產靜態路徑（對應舊版 getStaticPaths）
-export async function generateStaticParams() {
-  const news: any[] = await sanityClient.fetch(newsQuery)
-  return (news ?? [])
-    .filter((n) => n?.slug?.current)
-    .map((n) => ({ slug: n.slug.current as string }))
-}
-
-// SEO（可選）：依文章內容設定 <title>/<meta>
-export async function generateMetadata(
-  { params }: { params: Params }
-): Promise<Metadata> {
-  const data: any = await sanityClient.fetch(newsBySlugQuery, { slug: params.slug })
-
-  if (!data) {
-    return {
-      title: '未找到內容｜白噪島',
-      description: '您尋找的文章不存在或已被移除。',
+type NewsDetail = {
+  title: string
+  publishedAt: string
+  coverImage?: {
+    asset: {
+      _ref: string
+      _type: string
     }
+    alt?: string
   }
+  body?: Array<{
+    _type: string
+    [key: string]: unknown
+  }>
+}
 
-  const title = `${data.title} - 白噪島`
-  const description = data.excerpt || data.title
-  const ogImage =
-    data.coverImage ? urlForImage(data.coverImage).width(1200).height(630).url() : undefined
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      images: ogImage ? [{ url: ogImage }] : undefined,
-      type: 'article',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: ogImage ? [ogImage] : undefined,
-    },
+export async function generateStaticParams() {
+  try {
+    const slugs: {slug: {current: string}}[] = await sanityClient.fetch(
+      `*[_type == "news" && defined(slug.current)]{slug}`
+    )
+    return slugs.map(s => ({slug: s.slug.current}))
+  } catch (error) {
+    console.error('Failed to generate static params:', error)
+    return []
   }
 }
 
-// 頁面主體（對應舊版 getStaticProps + 頁面組件）
-export default async function NewsDetailPage({ params }: { params: Params }) {
-  const news: any = await sanityClient.fetch(newsBySlugQuery, { slug: params.slug })
-  if (!news) {
-    notFound()
+export default async function NewsPage({params}: {params: Promise<{slug: string}>}) {
+  const {slug} = await params
+  let data: NewsDetail | null = null
+  
+  try {
+    data = await sanityClient.fetch<NewsDetail | null>(
+      `*[_type == "news" && slug.current == $slug][0]{
+        title, publishedAt, coverImage, 
+        body[]{
+          ...,
+          _type == "image" => {
+            ...,
+            asset->,
+            alt,
+            caption
+          }
+        }
+      }`,
+      {slug}
+    )
+  } catch (error) {
+    console.error('Failed to fetch news detail:', error)
+    return notFound()
   }
 
-  const cover =
-    news.coverImage ? urlForImage(news.coverImage).width(1200).height(630).url() : null
+  if (!data) return notFound()
 
   return (
-    <div className="news-detail mx-auto max-w-3xl px-6 py-10">
-      <article>
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold leading-tight">{news.title}</h1>
-          {news.publishedAt && (
-            <time className="mt-2 block text-sm text-neutral-500" dateTime={news.publishedAt}>
-              {formatDate(news.publishedAt)}
-            </time>
-          )}
-        </header>
+    <main className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+      <header className="mb-8">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
+          {data.title}
+        </h1>
+        <time className="text-sm text-gray-500 dark:text-gray-400" dateTime={data.publishedAt}>
+          {formatTWT(data.publishedAt)}
+        </time>
+      </header>
 
-        {cover && (
-          <div className="my-6 overflow-hidden rounded-lg">
-            <Image
-              src={cover}
-              alt={news.title}
-              width={1200}
-              height={630}
-              style={{ objectFit: 'cover' }}
-              priority
-            />
-          </div>
-        )}
+      {data.coverImage && (
+        <div className="my-8 rounded-lg overflow-hidden shadow-lg">
+          <Image
+            src={urlFor(data.coverImage).width(1200).height(630).fit('crop').url()}
+            alt={data.title}
+            width={1200}
+            height={630}
+            priority
+            className="w-full h-auto"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+          />
+        </div>
+      )}
 
-        {news.excerpt && (
-          <div className="my-6 rounded-lg bg-neutral-100 p-4 text-base italic leading-7">
-            {news.excerpt}
-          </div>
-        )}
+      {data.body && (
+        <article className="prose prose-lg max-w-none dark:prose-invert">
+          <PortableText value={data.body} components={ptComponents} />
+        </article>
+      )}
 
-        {news.body && (
-          <div className="prose prose-neutral max-w-none">
-            <PortableText value={news.body} />
-          </div>
-        )}
-      </article>
-
-      <div className="mt-10 border-t pt-6">
-        <a href="/" className="font-medium text-blue-600 hover:underline">
-          ← 返回首頁
-        </a>
-      </div>
-    </div>
+      <nav className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+        <Link 
+          href="/" 
+          className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium transition-colors"
+        >
+          <svg className="mr-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          回到首頁
+        </Link>
+      </nav>
+    </main>
   )
 }
