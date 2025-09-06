@@ -2,9 +2,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import {notFound} from 'next/navigation'
 import {PortableText} from '@portabletext/react'
-import {sanityClient} from '@/lib/sanity.client'
-import {urlFor} from '@/lib/sanity.image'
-import {formatTWT} from '@/lib/formatDate'
+import {sanityClient} from '../../../lib/sanity.client'
+import {urlFor} from '../../../lib/sanity.image'
+import {formatTWT} from '../../../lib/formatDate'
 
 export const revalidate = 60
 

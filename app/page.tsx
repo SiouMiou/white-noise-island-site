@@ -1,7 +1,7 @@
 // app/page.tsx
 import Link from 'next/link'
-import {sanityClient} from '@/lib/sanity.client'
-import {formatTWT} from '@/lib/formatDate'
+import {sanityClient} from '../lib/sanity.client'
+import {formatTWT} from '../lib/formatDate'
 
 export const revalidate = 60 // ISR：每 60 秒背景再生
 
