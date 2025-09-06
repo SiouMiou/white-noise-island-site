@@ -35,7 +35,7 @@ export default function BannerCarousel({
     return () => {
       if (timerRef.current) window.clearInterval(timerRef.current)
     }
-  }, [intervalMs, total, prefersReducedMotion])
+  }, [intervalMs, total, prefersReducedMotion, next])
 
   function pause() {
     if (timerRef.current) {

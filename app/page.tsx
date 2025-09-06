@@ -15,7 +15,13 @@ type NewsDoc = {
   slug: { current: string }
   publishedAt?: string
   excerpt?: string
-  coverImage?: any
+  coverImage?: {
+    asset: {
+      _ref: string
+      _type: string
+    }
+    alt?: string
+  }
 }
 
 const latestNewsQuery = `*[_type == "news" && defined(slug.current) && publishedAt <= now()] 
@@ -47,7 +53,7 @@ export default async function HomePage() {
     .map(n => ({
       title: n.title,
       href: `/news/${n.slug.current}`,
-      imageUrl: urlFor(n.coverImage).width(1600).height(700).fit('crop').auto('format').url(),
+      imageUrl: urlFor(n.coverImage!).width(1600).height(700).fit('crop').auto('format').url(),
     }))
 
   return (
