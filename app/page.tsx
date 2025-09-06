@@ -1,77 +1,192 @@
 // app/page.tsx
 import Link from 'next/link'
+import Image from 'next/image'
 import {sanityClient} from '../lib/sanity.client'
+import {urlFor} from '../lib/sanity.image'
 import {formatTWT} from '../lib/formatDate'
+import {getSiteSettings} from '../lib/siteSettings'
+import BannerCarousel from '../components/BannerCarousel'
 
-export const revalidate = 60 // ISR：每 60 秒背景再生
+export const revalidate = 60 // ISR：每 60 秒再驗證
 
-type NewsItem = {
+type NewsDoc = {
   _id: string
   title: string
   slug: { current: string }
-  publishedAt: string
+  publishedAt?: string
   excerpt?: string
+  coverImage?: any
 }
 
-export default async function Home() {
-  let items: NewsItem[] = []
+const latestNewsQuery = `*[_type == "news" && defined(slug.current) && publishedAt <= now()] 
+  | order(publishedAt desc)[0...6]{
+    _id,
+    title,
+    slug,
+    publishedAt,
+    excerpt,
+    coverImage
+  }`
+
+export default async function HomePage() {
+  let news: NewsDoc[] = []
+  let siteSettings = null
   
   try {
-    items = await sanityClient.fetch<NewsItem[]>(
-      `*[_type == "news" && defined(publishedAt) && publishedAt <= now()]
-       | order(publishedAt desc){
-         _id, title, slug, publishedAt, excerpt
-       }[0...20]`
-    )
+    [news, siteSettings] = await Promise.all([
+      sanityClient.fetch<NewsDoc[]>(latestNewsQuery),
+      getSiteSettings()
+    ])
   } catch (error) {
-    console.error('Failed to fetch news items:', error)
-    // 如果 Sanity 連線失敗，顯示空狀態而不是崩潰
+    console.error('Failed to fetch data:', error)
   }
 
+  const banners = (news ?? [])
+    .filter(n => n.coverImage)
+    .slice(0, 3)
+    .map(n => ({
+      title: n.title,
+      href: `/news/${n.slug.current}`,
+      imageUrl: urlFor(n.coverImage).width(1600).height(700).fit('crop').auto('format').url(),
+    }))
+
   return (
-    <main className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
-      <header className="mb-8">
-        <h1 className="text-3xl sm:text-4xl font-bold mb-2">白噪島</h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400">最新消息與資訊</p>
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* 站點導覽（簡易） */}
+      <header className="sticky top-0 z-50 border-b bg-white/70 dark:bg-gray-900/70 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+          <Link href="/" className="flex items-center gap-2 font-semibold text-gray-900 dark:text-white">
+            <span className="sr-only">{siteSettings?.title || '白噪島'}</span>
+            {siteSettings?.favicon ? (
+              <Image 
+                src={urlFor(siteSettings.favicon).width(24).height(24).url()} 
+                alt="" 
+                width={24} 
+                height={24} 
+              />
+            ) : (
+              <Image src="/favicon.ico" alt="" width={24} height={24} />
+            )}
+            <span>{siteSettings?.title || '白噪島'}</span>
+          </Link>
+          <nav className="flex items-center gap-6 text-sm">
+            <Link href="/news" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">最新消息</Link>
+            <Link href="/about" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">關於我們</Link>
+            <Link href="/members" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">成員介紹</Link>
+            <Link href="/recruit" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">招募</Link>
+          </nav>
+        </div>
       </header>
-      
-      {items.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500 dark:text-gray-400">目前沒有最新消息</p>
-          <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
-            請檢查 Sanity 環境變數設定
-          </p>
-        </div>
-      ) : (
-        <div className="grid gap-6 sm:gap-8">
-          {items.map(n => (
-            <article key={n._id} className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-b-0">
-              <h2 className="text-xl sm:text-2xl font-semibold mb-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                <Link href={`/news/${n.slug.current}`} className="block">
-                  {n.title}
-                </Link>
-              </h2>
-              <time className="text-sm text-gray-500 dark:text-gray-400 block mb-3" dateTime={n.publishedAt}>
-                {formatTWT(n.publishedAt)}
-              </time>
-              {n.excerpt && (
-                <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
-                  {n.excerpt}
-                </p>
+
+      {/* 1) 首屏：大型 GIF LOGO 動畫 */}
+      <section className="relative isolate">
+        <div className="mx-auto max-w-6xl px-4 py-10 sm:py-14">
+          <div className="relative overflow-hidden rounded-2xl border bg-white dark:bg-gray-800 shadow-lg">
+            {/* 品牌 LOGO 動畫 */}
+            <div className="relative h-[220px] sm:h-[300px] md:h-[360px]">
+              {siteSettings?.logo ? (
+                <Image
+                  src={urlFor(siteSettings.logo).width(1200).height(360).fit('crop').url()}
+                  alt={siteSettings.logo.alt || `${siteSettings.title} LOGO`}
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, 1200px"
+                  style={{ objectFit: 'cover' }}
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full bg-gray-100 dark:bg-gray-700">
+                  <span className="text-gray-500 dark:text-gray-400">請在 Sanity 後台設定 LOGO</span>
+                </div>
               )}
-              <Link 
-                className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium transition-colors" 
-                href={`/news/${n.slug.current}`}
-              >
-                繼續閱讀
-                <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </article>
-          ))}
+            </div>
+            <div className="border-t px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+              {siteSettings?.description || '以日系簡約風格呈現的企劃官網'}
+            </div>
+          </div>
         </div>
+      </section>
+
+      {/* 2) 最新活動 Banner 輪播（自動播放） */}
+      {banners.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4">
+          <BannerCarousel items={banners} intervalMs={5000} />
+        </section>
       )}
+
+      {/* 3) 最新消息（精簡列表） */}
+      <section className="mx-auto max-w-6xl px-4 pb-16 pt-10 sm:pt-12">
+        <div className="mb-4 flex items-end justify-between">
+          <h2 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">最新消息</h2>
+          <Link href="/news" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+            查看全部
+          </Link>
+        </div>
+
+        <ul className="grid gap-6 sm:grid-cols-2">
+          {(news ?? []).map((item) => {
+            const cover = item.coverImage
+              ? urlFor(item.coverImage).width(800).height(450).fit('crop').auto('format').url()
+              : null
+
+            return (
+              <li key={item._id} className="group overflow-hidden rounded-xl border bg-white dark:bg-gray-800 shadow-sm transition-all hover:shadow-md">
+                <Link href={`/news/${item.slug.current}`} className="block">
+                  {cover && (
+                    <div className="relative h-44 w-full">
+                      <Image
+                        src={cover}
+                        alt={item.title}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        style={{ objectFit: 'cover' }}
+                      />
+                    </div>
+                  )}
+                  <div className="space-y-2 p-4">
+                    {item.publishedAt && (
+                      <time className="block text-xs text-gray-500 dark:text-gray-400" dateTime={item.publishedAt}>
+                        {formatTWT(item.publishedAt)}
+                      </time>
+                    )}
+                    <h3 className="line-clamp-2 text-base font-semibold leading-snug text-gray-900 dark:text-white">
+                      {item.title}
+                    </h3>
+                    {item.excerpt && (
+                      <p className="line-clamp-2 text-sm text-gray-600 dark:text-gray-300">
+                        {item.excerpt}
+                      </p>
+                    )}
+                  </div>
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
+      </section>
+
+      {/* 底部社群／聯絡（簡易） */}
+      <footer className="border-t bg-white dark:bg-gray-800 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="flex items-center justify-center gap-6">
+            <Link 
+              href={`mailto:${siteSettings?.contactEmail || 'hello@example.com'}`} 
+              className="hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+              聯絡我們
+            </Link>
+            {siteSettings?.socialLinks?.twitter && (
+              <Link href={siteSettings.socialLinks.twitter} className="hover:text-gray-900 dark:hover:text-white transition-colors">Twitter</Link>
+            )}
+            {siteSettings?.socialLinks?.youtube && (
+              <Link href={siteSettings.socialLinks.youtube} className="hover:text-gray-900 dark:hover:text-white transition-colors">YouTube</Link>
+            )}
+            {siteSettings?.socialLinks?.instagram && (
+              <Link href={siteSettings.socialLinks.instagram} className="hover:text-gray-900 dark:hover:text-white transition-colors">Instagram</Link>
+            )}
+          </div>
+          <div className="mt-3">© {new Date().getFullYear()} {siteSettings?.title || '白噪島'}</div>
+        </div>
+      </footer>
     </main>
   )
 }

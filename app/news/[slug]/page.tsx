@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import {notFound} from 'next/navigation'
 import {PortableText} from '@portabletext/react'
+import {Metadata} from 'next'
 import {sanityClient} from '../../../lib/sanity.client'
 import {urlFor} from '../../../lib/sanity.image'
 import {formatTWT} from '../../../lib/formatDate'
@@ -12,6 +13,7 @@ export const revalidate = 60
 type NewsDetail = {
   title: string
   publishedAt: string
+  excerpt?: string
   coverImage?: {
     asset: {
       _ref: string
@@ -37,6 +39,57 @@ export async function generateStaticParams() {
   }
 }
 
+// SEO metadata 生成
+export async function generateMetadata({params}: {params: Promise<{slug: string}>}): Promise<Metadata> {
+  const {slug} = await params
+  
+  try {
+    const data = await sanityClient.fetch<NewsDetail | null>(
+      `*[_type == "news" && slug.current == $slug][0]{
+        title, excerpt, coverImage
+      }`,
+      {slug}
+    )
+
+    if (!data) {
+      return {
+        title: '頁面不存在 | 白噪島',
+        description: '您要找的頁面不存在或已被移除。',
+      }
+    }
+
+    const title = `${data.title} | 白噪島`
+    const description = data.excerpt || data.title
+    const ogImage = data.coverImage 
+      ? urlFor(data.coverImage).width(1200).height(630).fit('crop').url()
+      : undefined
+
+    return {
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+        images: ogImage ? [{ url: ogImage, width: 1200, height: 630 }] : undefined,
+        type: 'article',
+        siteName: '白噪島',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: ogImage ? [ogImage] : undefined,
+      },
+    }
+  } catch (error) {
+    console.error('Failed to generate metadata:', error)
+    return {
+      title: '白噪島',
+      description: '白噪島官方網站',
+    }
+  }
+}
+
 export default async function NewsPage({params}: {params: Promise<{slug: string}>}) {
   const {slug} = await params
   let data: NewsDetail | null = null
@@ -44,7 +97,7 @@ export default async function NewsPage({params}: {params: Promise<{slug: string}
   try {
     data = await sanityClient.fetch<NewsDetail | null>(
       `*[_type == "news" && slug.current == $slug][0]{
-        title, publishedAt, coverImage, 
+        title, publishedAt, excerpt, coverImage, 
         body[]{
           ...,
           _type == "image" => {
@@ -86,6 +139,14 @@ export default async function NewsPage({params}: {params: Promise<{slug: string}
             className="w-full h-auto"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
           />
+        </div>
+      )}
+
+      {data.excerpt && (
+        <div className="my-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border-l-4 border-blue-500">
+          <p className="text-lg text-gray-700 dark:text-gray-300 italic leading-relaxed">
+            {data.excerpt}
+          </p>
         </div>
       )}
 
