@@ -4,6 +4,7 @@ import {notFound} from 'next/navigation'
 import {PortableText} from '@portabletext/react'
 import {sanityClient} from '@/lib/sanity.client'
 import {urlFor} from '@/lib/sanity.image'
+import {formatTWT} from '@/lib/formatDate'
 
 export const revalidate = 60
 
@@ -24,20 +25,32 @@ type NewsDetail = {
 }
 
 export async function generateStaticParams() {
-  const slugs: {slug: {current: string}}[] = await sanityClient.fetch(
-    `*[_type == "news" && defined(slug.current)]{slug}`
-  )
-  return slugs.map(s => ({slug: s.slug.current}))
+  try {
+    const slugs: {slug: {current: string}}[] = await sanityClient.fetch(
+      `*[_type == "news" && defined(slug.current)]{slug}`
+    )
+    return slugs.map(s => ({slug: s.slug.current}))
+  } catch (error) {
+    console.error('Failed to generate static params:', error)
+    return []
+  }
 }
 
 export default async function NewsPage({params}: {params: Promise<{slug: string}>}) {
   const {slug} = await params
-  const data = await sanityClient.fetch<NewsDetail | null>(
-    `*[_type == "news" && slug.current == $slug][0]{
-      title, publishedAt, coverImage, body
-    }`,
-    {slug}
-  )
+  let data: NewsDetail | null = null
+  
+  try {
+    data = await sanityClient.fetch<NewsDetail | null>(
+      `*[_type == "news" && slug.current == $slug][0]{
+        title, publishedAt, coverImage, body
+      }`,
+      {slug}
+    )
+  } catch (error) {
+    console.error('Failed to fetch news detail:', error)
+    return notFound()
+  }
 
   if (!data) return notFound()
 
@@ -47,14 +60,8 @@ export default async function NewsPage({params}: {params: Promise<{slug: string}
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
           {data.title}
         </h1>
-        <time className="text-sm text-gray-500 dark:text-gray-400">
-          {new Date(data.publishedAt).toLocaleString('zh-TW', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          })}
+        <time className="text-sm text-gray-500 dark:text-gray-400" dateTime={data.publishedAt}>
+          {formatTWT(data.publishedAt)}
         </time>
       </header>
 

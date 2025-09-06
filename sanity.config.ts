@@ -11,4 +11,10 @@ export default defineConfig({
   basePath: '/studio', // 嵌入用在 /studio
   plugins: [deskTool(), visionTool()],
   schema: {types: schemaTypes},
+  // 確保 Studio 可以正確載入
+  studio: {
+    components: {
+      // 可以添加自定義組件
+    }
+  }
 })

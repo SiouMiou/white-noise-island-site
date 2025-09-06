@@ -1,6 +1,7 @@
 // app/page.tsx
 import Link from 'next/link'
 import {sanityClient} from '@/lib/sanity.client'
+import {formatTWT} from '@/lib/formatDate'
 
 export const revalidate = 60 // ISR：每 60 秒背景再生
 
@@ -13,12 +14,19 @@ type NewsItem = {
 }
 
 export default async function Home() {
-  const items = await sanityClient.fetch<NewsItem[]>(
-    `*[_type == "news" && defined(publishedAt) && publishedAt <= now()]
-     | order(publishedAt desc){
-       _id, title, slug, publishedAt, excerpt
-     }[0...20]`
-  )
+  let items: NewsItem[] = []
+  
+  try {
+    items = await sanityClient.fetch<NewsItem[]>(
+      `*[_type == "news" && defined(publishedAt) && publishedAt <= now()]
+       | order(publishedAt desc){
+         _id, title, slug, publishedAt, excerpt
+       }[0...20]`
+    )
+  } catch (error) {
+    console.error('Failed to fetch news items:', error)
+    // 如果 Sanity 連線失敗，顯示空狀態而不是崩潰
+  }
 
   return (
     <main className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
@@ -30,6 +38,9 @@ export default async function Home() {
       {items.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-500 dark:text-gray-400">目前沒有最新消息</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+            請檢查 Sanity 環境變數設定
+          </p>
         </div>
       ) : (
         <div className="grid gap-6 sm:gap-8">
@@ -40,14 +51,8 @@ export default async function Home() {
                   {n.title}
                 </Link>
               </h2>
-              <time className="text-sm text-gray-500 dark:text-gray-400 block mb-3">
-                {new Date(n.publishedAt).toLocaleString('zh-TW', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
+              <time className="text-sm text-gray-500 dark:text-gray-400 block mb-3" dateTime={n.publishedAt}>
+                {formatTWT(n.publishedAt)}
               </time>
               {n.excerpt && (
                 <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
