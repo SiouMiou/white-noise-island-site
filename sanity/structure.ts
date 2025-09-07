@@ -4,9 +4,10 @@ import type {StructureResolver} from 'sanity/desk'
 export const structure: StructureResolver = (S, {currentUser}) => {
   const isAdmin = currentUser?.roles?.some((r) => r.name === 'administrator')
 
-  return S.list().title('內容').items([
+  return S.list().id('content').title('內容').items([
     // 最新消息
     S.listItem()
+      .id('news')
       .title('最新消息')
       .schemaType('news')
       .child(S.documentTypeList('news').title('最新消息')),
