@@ -9,6 +9,7 @@ import {urlFor} from '../../../lib/sanity.image'
 import {formatTWT} from '../../../lib/formatDate'
 import {ptComponents} from '../../../lib/portableText'
 import {getSiteSettings} from '../../../lib/siteSettings'
+import type { SiteSettings } from '../../../lib/siteSettings'
 
 export const revalidate = 60
 
@@ -95,7 +96,7 @@ export async function generateMetadata({params}: {params: Promise<{slug: string}
 export default async function NewsPage({params}: {params: Promise<{slug: string}>}) {
   const {slug} = await params
   let data: NewsDetail | null = null
-  let siteSettings: any = null
+  let siteSettings: SiteSettings | null = null
   
   try {
     const [newsData, settingsData] = await Promise.all([
