@@ -28,6 +28,15 @@ export default defineType({
       initialValue: '以日系簡約風格呈現的企劃官網'
     }),
     defineField({
+      name: 'favicon',
+      title: '網站圖標 (Favicon)',
+      type: 'file',
+      description: '建議上傳 32x32 以上的PNG 或 ICO，支援 .ico/.png/.svg',
+      options: {
+        accept: '.ico,.png,.svg,image/png,image/svg+xml,image/x-icon,image/vnd.microsoft.icon'
+      }
+    }),
+    defineField({
       name: 'useSvgAnimation',
       title: '使用 SVG 動畫 LOGO',
       type: 'boolean',
@@ -51,16 +60,6 @@ export default defineType({
         }
       ],
       hidden: ({document}) => document?.useSvgAnimation === true,
-    }),
-    defineField({
-      name: 'favicon',
-      title: '網站圖標 (Favicon)',
-      type: 'image',
-      description: '建議上傳 32x32 以上的PNG 或 ICO，支援 .ico/.png/.svg',
-      options: {
-        hotspot: true,
-        accept: 'image/png,image/svg+xml,image/x-icon,image/vnd.microsoft.icon,.ico'
-      }
     }),
     defineField({
       name: 'defaultCoverImage',
