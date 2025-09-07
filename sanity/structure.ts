@@ -12,19 +12,16 @@ export const structure: StructureResolver = (S, {currentUser}) => {
       .schemaType('news')
       .child(S.documentTypeList('news').title('最新消息')),
 
-    // 僅管理員可見的網站設定（單例）
-    ...(isAdmin
-      ? [
-          S.listItem()
-            .title('網站設定')
-            .id('siteSettings')
-            .child(
-              S.document()
-                .schemaType('siteSettings')
-                .documentId('siteSettings')
-            ),
-        ]
-      : []),
+    // 網站設定（單例）- 暫時對所有使用者開放以解決展開問題
+    S.listItem()
+      .title('網站設定')
+      .id('siteSettings')
+      .child(
+        S.document()
+          .schemaType('siteSettings')
+          .documentId('siteSettings')
+          .title('網站設定')
+      ),
   ])
 }
 
