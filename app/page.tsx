@@ -88,7 +88,7 @@ export default function HomePage() {
             <span className="sr-only">{siteSettings?.title || '白噪島'}</span>
             {siteSettings?.favicon ? (
               <Image 
-                src={urlFor(siteSettings.favicon).width(24).height(24).url()} 
+                src={siteSettings.favicon.asset.url || '/favicon.ico'} 
                 alt="" 
                 width={24} 
                 height={24} 

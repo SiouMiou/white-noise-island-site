@@ -18,7 +18,7 @@ export type SiteSettings = {
     asset: {
       _ref: string
       _type: string
-      url?: string
+      url: string
     }
   }
   defaultCoverImage?: {
