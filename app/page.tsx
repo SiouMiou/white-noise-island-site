@@ -9,6 +9,7 @@ import {sanityClient} from '../lib/sanity.client'
 import {urlFor} from '../lib/sanity.image'
 import {formatTWT} from '../lib/formatDate'
 import {getSiteSettings} from '../lib/siteSettings'
+import type { SiteSettings } from '../lib/siteSettings'
 import BannerCarousel from '../components/BannerCarousel'
 import LogoAnimation from '../components/LogoAnimation'
 import LoadingAnimation from '../components/LoadingAnimation'
@@ -42,8 +43,7 @@ const latestNewsQuery = `*[_type == "news" && defined(slug.current) && published
 export default function HomePage() {
   const { isLoading, isFirstLoad, completeLoading } = useLoadingState()
   const [news, setNews] = useState<NewsDoc[]>([])
-  const [siteSettings, setSiteSettings] = useState<any>(null)
-  const [dataLoaded, setDataLoaded] = useState(false)
+  const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null)
 
   useEffect(() => {
     // 載入資料
@@ -55,10 +55,10 @@ export default function HomePage() {
         ])
         setNews(newsData)
         setSiteSettings(settingsData)
-        setDataLoaded(true)
+        // data loaded
       } catch (error) {
         console.error('Failed to fetch data:', error)
-        setDataLoaded(true)
+        // data loaded (error path)
       }
     }
 
@@ -80,11 +80,11 @@ export default function HomePage() {
     }))
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <main className="min-h-screen" style={{ background: 'linear-gradient(135deg, #FFF 0%, #FAFBFF 60%, #FFEDF3 100%)' }}>
       {/* 站點導覽（簡易） */}
       <header className="sticky top-0 z-50 border-b bg-white/70 dark:bg-gray-900/70 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <Link href="/" className="flex items-center gap-2 font-semibold text-gray-900 dark:text-white">
+          <Link href="/" className="flex items-center gap-2 font-semibold text-gray-900 dark:text-white hover-float">
             <span className="sr-only">{siteSettings?.title || '白噪島'}</span>
             {siteSettings?.favicon ? (
               <Image 
@@ -110,7 +110,7 @@ export default function HomePage() {
       {/* 1) 首屏：大型 GIF LOGO 動畫 */}
       <section className="relative isolate">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:py-14">
-          <div className="relative overflow-hidden rounded-2xl border bg-white dark:bg-gray-800 shadow-lg">
+          <div className="relative overflow-hidden rounded-2xl border bg-white dark:bg-gray-800 shadow-lg card">
             {/* 品牌 LOGO 動畫 */}
             <div className="relative h-[220px] sm:h-[300px] md:h-[360px] bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900">
               {siteSettings?.useSvgAnimation !== false ? (
@@ -128,8 +128,14 @@ export default function HomePage() {
                 <LogoAnimation />
               )}
             </div>
-            <div className="border-t px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-              {siteSettings?.description || '以日系簡約風格呈現的企劃官網'}
+            <div className="border-t px-6 py-6 text-gray-700 dark:text-gray-300 flex items-center justify-between">
+              <div className="text-sm">
+                {siteSettings?.description || '以日系簡約風格呈現的企劃官網'}
+              </div>
+              <div className="flex gap-3">
+                <Link href="/news" className="btn btn-primary">最新消息</Link>
+                <Link href="/about" className="btn btn-secondary">探索我們</Link>
+              </div>
             </div>
           </div>
         </div>
@@ -158,8 +164,8 @@ export default function HomePage() {
               : null
 
             return (
-              <li key={item._id} className="group overflow-hidden rounded-xl border bg-white dark:bg-gray-800 shadow-sm transition-all hover:shadow-md">
-                <Link href={`/news/${item.slug.current}`} className="block">
+              <li key={item._id} className="group overflow-hidden rounded-xl border bg-white dark:bg-gray-800 shadow-sm transition-all hover:shadow-md card">
+                <Link href={`/news/${item.slug.current}`} className="block hover-bright">
                   {cover && (
                     <div className="relative h-44 w-full">
                       <Image

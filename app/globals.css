@@ -2,8 +2,32 @@
 @import "tailwindcss";
 
 :root {
+  /* brand palette */
+  --brand: #FF5A8C; /* 主色 */
+  --accent: #5DD7F1; /* 輔色 */
+  --sun: #FFD24D; /* 高光 */
+  --ink: #222632; /* 深色標題 */
+  --text: #3B3F4A; /* 內文 */
+  --line: #E8EAF0; /* 邊框 */
+  --bg: #FFFFFF; /* 背景 */
+  --bg-soft: #FAFBFF; /* 柔色背景 */
+
+  /* motion & radius */
+  --radius-card: 16px;
+  --radius-card-lg: 24px;
+  --elev: 0 10px 30px rgba(34, 38, 50, 0.08);
+  --elev-hover: 0 12px 34px rgba(34, 38, 50, 0.12);
+  --dur: 220ms;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* legacy fallback */
   --background: #ffffff;
   --foreground: #171717;
+
+  /* fonts (由 layout.tsx 注入變數) */
+  --font-heading: var(--font-geist-sans);
+  --font-body: var(--font-geist-sans);
+  --font-accent: var(--font-geist-mono);
 }
 
 /* Custom CSS variables for Tailwind */
@@ -16,10 +40,74 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body), system-ui, -apple-system, sans-serif;
   line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--ink);
+  font-family: var(--font-heading), system-ui, -apple-system, sans-serif;
+}
+
+/* buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease), filter var(--dur) var(--ease), background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+  will-change: transform, box-shadow, filter;
+}
+.btn-primary {
+  background: var(--brand);
+  color: #fff;
+  box-shadow: var(--elev);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--elev-hover);
+  filter: brightness(1.05);
+}
+.btn-secondary {
+  background: color-mix(in srgb, var(--accent) 90%, white);
+  color: #0b2a33;
+  box-shadow: var(--elev);
+}
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--elev-hover);
+  filter: brightness(1.05);
+}
+
+/* cards */
+.card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: #fff;
+  box-shadow: var(--elev);
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.card:hover {
+  transform: scale(1.01);
+  box-shadow: var(--elev-hover);
+  border-color: rgba(255, 90, 140, 0.1);
+}
+
+/* helpers */
+.hover-float {
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.hover-float:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--elev-hover);
+}
+.hover-bright:hover {
+  filter: brightness(1.05);
 }
 
 /* 改善 prose 樣式 */
@@ -28,7 +116,7 @@ body {
 }
 
 .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-  color: inherit;
+  color: var(--ink);
   font-weight: 600;
   margin-top: 2rem;
   margin-bottom: 1rem;

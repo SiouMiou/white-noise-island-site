@@ -1,6 +1,7 @@
 // 檔案路徑：app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { M_PLUS_Rounded_1c, Zen_Maru_Gothic, Noto_Sans_TC, Poppins } from "next/font/google";
 import "./globals.css";
 import { getSiteSettings } from "../lib/siteSettings";
 import { urlFor } from "../lib/sanity.image";
@@ -13,6 +14,32 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+// headings: M PLUS Rounded 1c / Zen Maru Gothic
+const rounded = M_PLUS_Rounded_1c({
+  variable: "--font-heading",
+  subsets: ["latin"],
+  weight: ["400", "700"],
+});
+const zenMaru = Zen_Maru_Gothic({
+  variable: "--font-heading-fallback",
+  subsets: ["latin"],
+  weight: ["400", "700"],
+});
+
+// body: Noto Sans TC
+const notoTC = Noto_Sans_TC({
+  variable: "--font-body",
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+});
+
+// accent: Poppins
+const poppins = Poppins({
+  variable: "--font-accent",
+  subsets: ["latin"],
+  weight: ["500", "700"],
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -71,7 +98,7 @@ export default function RootLayout({
   return (
     <html lang="zh-TW">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${rounded.variable} ${zenMaru.variable} ${notoTC.variable} ${poppins.variable} antialiased`}
       >
         {children}
       </body>
