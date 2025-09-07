@@ -48,8 +48,14 @@ export async function generateMetadata(): Promise<Metadata> {
   const title = siteSettings?.title || "白噪島";
   const description = siteSettings?.description || "白噪島官方網站，提供最新的消息和資訊";
   
-  const faviconUrl = siteSettings?.favicon?.asset?.url
-    ? siteSettings.favicon.asset.url
+  const faviconUrl = siteSettings?.favicon
+    ? (() => {
+        try {
+          return urlFor(siteSettings.favicon).width(32).height(32).url()
+        } catch {
+          return '/favicon.ico'
+        }
+      })()
     : '/favicon.ico'
   return {
     title: `${title} - 最新消息`,

@@ -55,9 +55,10 @@ export default defineType({
     defineField({
       name: 'favicon',
       title: '網站圖標 (Favicon)',
-      type: 'file',
+      type: 'image',
       description: '建議上傳 32x32 以上的PNG 或 ICO，支援 .ico/.png/.svg',
       options: {
+        hotspot: true,
         accept: 'image/png,image/svg+xml,image/x-icon,image/vnd.microsoft.icon,.ico'
       }
     }),
