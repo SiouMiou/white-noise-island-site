@@ -113,7 +113,7 @@ export default function HomePage() {
           <div className="relative overflow-hidden rounded-2xl border bg-white dark:bg-gray-800 shadow-lg card">
             {/* 品牌 LOGO 動畫 */}
             <div className="relative h-[220px] sm:h-[300px] md:h-[360px] bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900">
-              {siteSettings?.useSvgAnimation === true ? (
+              {siteSettings?.useSvgAnimation !== false ? (
                 <LogoAnimation />
               ) : siteSettings?.logo ? (
                 <Image
@@ -163,6 +163,8 @@ export default function HomePage() {
           {(news ?? []).map((item) => {
             const cover = item.coverImage
               ? urlFor(item.coverImage).width(800).height(450).fit('crop').auto('format').url()
+              : siteSettings?.defaultCoverImage
+              ? urlFor(siteSettings.defaultCoverImage).width(800).height(450).fit('crop').auto('format').url()
               : null
 
             return (
