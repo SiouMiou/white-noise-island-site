@@ -48,16 +48,15 @@ export async function generateMetadata(): Promise<Metadata> {
   const title = siteSettings?.title || "白噪島";
   const description = siteSettings?.description || "白噪島官方網站，提供最新的消息和資訊";
   
-  // 生成 favicon URL
-  let faviconUrl = "/favicon.ico"; // 預設 favicon
-  if (siteSettings?.favicon) {
-    try {
-      faviconUrl = urlFor(siteSettings.favicon).width(32).height(32).url();
-    } catch (error) {
-      console.error('Failed to generate favicon URL:', error);
-    }
-  }
-
+  const faviconUrl = siteSettings?.favicon
+    ? (() => {
+        try {
+          return urlFor(siteSettings.favicon).width(32).height(32).url()
+        } catch {
+          return '/favicon.ico'
+        }
+      })()
+    : '/favicon.ico'
   return {
     title: `${title} - 最新消息`,
     description,

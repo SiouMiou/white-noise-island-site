@@ -1,6 +1,8 @@
 // 檔案路徑：sanity.config.ts
 import {defineConfig} from 'sanity'
 import {deskTool} from 'sanity/desk'
+import {structure} from './sanity/structure'
+import {singletonGuard} from './sanity/plugins/singletonGuard'
 import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './sanity/schemaTypes/index'
 
@@ -10,7 +12,7 @@ export default defineConfig({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
   basePath: '/studio', // 嵌入用在 /studio
-  plugins: [deskTool(), visionTool()],
+  plugins: [deskTool({structure}), singletonGuard(), visionTool()],
   schema: {types: schemaTypes},
   // 確保 Studio 可以正確載入
   studio: {

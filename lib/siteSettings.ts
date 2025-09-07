@@ -12,12 +12,7 @@ export type SiteSettings = {
     }
     alt?: string
   }
-  favicon?: {
-    asset: {
-      _ref: string
-      _type: string
-    }
-  }
+
   defaultCoverImage?: {
     asset: {
       _ref: string
