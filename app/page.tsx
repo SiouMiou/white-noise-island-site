@@ -113,7 +113,7 @@ export default function HomePage() {
           <div className="relative overflow-hidden rounded-2xl border bg-white dark:bg-gray-800 shadow-lg card">
             {/* 品牌 LOGO 動畫 */}
             <div className="relative h-[220px] sm:h-[300px] md:h-[360px] bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900">
-              {siteSettings?.useSvgAnimation !== false ? (
+              {siteSettings?.useSvgAnimation === true ? (
                 <LogoAnimation />
               ) : siteSettings?.logo ? (
                 <Image
@@ -125,7 +125,9 @@ export default function HomePage() {
                   style={{ objectFit: 'cover' }}
                 />
               ) : (
-                <LogoAnimation />
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  <span className="text-2xl font-bold">{siteSettings?.title || '白噪島'}</span>
+                </div>
               )}
             </div>
             <div className="border-t px-6 py-6 text-gray-700 dark:text-gray-300 flex items-center justify-between">

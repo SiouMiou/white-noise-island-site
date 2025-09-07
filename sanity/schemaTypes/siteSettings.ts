@@ -38,7 +38,7 @@ export default defineType({
       name: 'logo',
       title: '品牌 LOGO 圖片',
       type: 'image',
-      description: '首頁展示的 LOGO 圖片 (當不使用 SVG 動畫時)',
+      description: '建議 1200x360px 或 16:9 比例，支援 PNG/JPG/SVG',
       options: {
         hotspot: true
       },
@@ -65,7 +65,7 @@ export default defineType({
       name: 'defaultCoverImage',
       title: '預設封面圖片',
       type: 'image',
-      description: '當文章沒有封面圖時使用的預設圖片',
+      description: '建議 1200x630px 或 16:9 比例，當文章沒有封面圖時使用',
       options: {
         hotspot: true
       }
@@ -74,7 +74,7 @@ export default defineType({
       name: 'ogImage',
       title: '社群分享圖片',
       type: 'image',
-      description: '在社群媒體分享時顯示的圖片',
+      description: '建議 1200x630px 或 16:9 比例，在社群媒體分享時顯示',
       options: {
         hotspot: true
       },

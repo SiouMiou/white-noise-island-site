@@ -8,6 +8,7 @@ import {sanityClient} from '../../../lib/sanity.client'
 import {urlFor} from '../../../lib/sanity.image'
 import {formatTWT} from '../../../lib/formatDate'
 import {ptComponents} from '../../../lib/portableText'
+import {getSiteSettings} from '../../../lib/siteSettings'
 
 export const revalidate = 60
 
@@ -96,21 +97,25 @@ export default async function NewsPage({params}: {params: Promise<{slug: string}
   let data: NewsDetail | null = null
   
   try {
-    data = await sanityClient.fetch<NewsDetail | null>(
-      `*[_type == "news" && slug.current == $slug][0]{
-        title, publishedAt, excerpt, coverImage, 
-        body[]{
-          ...,
-          _type == "image" => {
+    const [newsData, siteSettings] = await Promise.all([
+      sanityClient.fetch<NewsDetail | null>(
+        `*[_type == "news" && slug.current == $slug][0]{
+          title, publishedAt, excerpt, coverImage, 
+          body[]{
             ...,
-            asset->,
-            alt,
-            caption
+            _type == "image" => {
+              ...,
+              asset->,
+              alt,
+              caption
+            }
           }
-        }
-      }`,
-      {slug}
-    )
+        }`,
+        {slug}
+      ),
+      getSiteSettings()
+    ])
+    data = newsData
   } catch (error) {
     console.error('Failed to fetch news detail:', error)
     return notFound()
@@ -129,10 +134,13 @@ export default async function NewsPage({params}: {params: Promise<{slug: string}
         </time>
       </header>
 
-      {data.coverImage && (
+      {(data.coverImage || siteSettings?.defaultCoverImage) && (
         <div className="my-8 rounded-lg overflow-hidden shadow-lg">
           <Image
-            src={urlFor(data.coverImage).width(1200).height(630).fit('crop').url()}
+            src={data.coverImage 
+              ? urlFor(data.coverImage).width(1200).height(630).fit('crop').url()
+              : urlFor(siteSettings!.defaultCoverImage!).width(1200).height(630).fit('crop').url()
+            }
             alt={data.title}
             width={1200}
             height={630}

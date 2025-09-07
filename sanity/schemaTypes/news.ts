@@ -38,6 +38,7 @@ export default defineType({
       name: 'coverImage',
       title: '首圖',
       type: 'image',
+      description: '建議 1200x630px 或 16:9 比例，支援 PNG/JPG/WebP',
       options: {hotspot: true}
     }),
     defineField({
@@ -48,6 +49,8 @@ export default defineType({
         {type: 'block'},
         {
           type: 'image',
+          title: '內文圖片',
+          description: '建議 800x600px 或 4:3 比例，支援 PNG/JPG/WebP',
           options: {hotspot: true},
           fields: [
             {
