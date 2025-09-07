@@ -95,9 +95,10 @@ export async function generateMetadata({params}: {params: Promise<{slug: string}
 export default async function NewsPage({params}: {params: Promise<{slug: string}>}) {
   const {slug} = await params
   let data: NewsDetail | null = null
+  let siteSettings: any = null
   
   try {
-    const [newsData, siteSettings] = await Promise.all([
+    const [newsData, settingsData] = await Promise.all([
       sanityClient.fetch<NewsDetail | null>(
         `*[_type == "news" && slug.current == $slug][0]{
           title, publishedAt, excerpt, coverImage, 
@@ -116,6 +117,7 @@ export default async function NewsPage({params}: {params: Promise<{slug: string}
       getSiteSettings()
     ])
     data = newsData
+    siteSettings = settingsData
   } catch (error) {
     console.error('Failed to fetch news detail:', error)
     return notFound()
