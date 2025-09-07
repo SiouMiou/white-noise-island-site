@@ -7,8 +7,11 @@ export default defineType({
   title: '網站設定',
   type: 'document',
   icon: CogIcon,
-  // 非管理者僅可讀
-  readOnly: ({currentUser}) => !currentUser?.roles?.some((r: any) => r.name === 'administrator'),
+  // 非管理者僅可讀（允許 'administrator' 或 'admin'）
+  readOnly: ({currentUser}) => {
+    const isAdmin = currentUser?.roles?.some((r: any) => r?.name === 'administrator' || r?.name === 'admin')
+    return !isAdmin
+  },
   fields: [
     defineField({
       name: 'title',
