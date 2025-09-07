@@ -7,12 +7,20 @@ export default defineType({
   title: '網站設定',
   type: 'document',
   icon: CogIcon,
+  // 移除單例限制，允許創建多個設定文件
   // 暫時移除 readOnly 限制以解決展開問題
   // readOnly: ({currentUser}) => {
   //   const isAdmin = currentUser?.roles?.some((r: any) => r?.name === 'administrator' || r?.name === 'admin')
   //   return !isAdmin
   // },
   fields: [
+    defineField({
+      name: 'name',
+      title: '設定名稱',
+      type: 'string',
+      description: '為這個設定版本命名，例如：主要設定、測試設定等',
+      validation: (Rule) => Rule.required().min(1).max(50),
+    }),
     defineField({
       name: 'title',
       title: '網站標題',

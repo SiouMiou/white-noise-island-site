@@ -2,6 +2,8 @@
 import {sanityClient} from './sanity.client'
 
 export type SiteSettings = {
+  _id: string
+  name: string
   title: string
   description?: string
   useSvgAnimation?: boolean
@@ -40,7 +42,9 @@ export type SiteSettings = {
   }
 }
 
-const siteSettingsQuery = `*[_type == "siteSettings"][0]{
+const siteSettingsQuery = `*[_type == "siteSettings"] | order(_createdAt desc)[0]{
+  _id,
+  name,
   title,
   description,
   useSvgAnimation,
