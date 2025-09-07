@@ -1,3 +1,4 @@
+// 檔案路徑：lib/sanity.image.ts
 import imageUrlBuilder from '@sanity/image-url'
 import {sanityClient} from './sanity.client'
 

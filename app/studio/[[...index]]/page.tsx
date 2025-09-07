@@ -1,4 +1,4 @@
-// app/studio/[[...index]]/page.tsx
+// 檔案路徑：app/studio/[[...index]]/page.tsx
 'use client'
 
 import { NextStudio } from 'next-sanity/studio'

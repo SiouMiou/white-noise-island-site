@@ -1,3 +1,4 @@
+// 檔案路徑：sanity/schemaTypes/siteSettings.ts
 import {defineType, defineField} from 'sanity'
 import {CogIcon} from '@sanity/icons'
 

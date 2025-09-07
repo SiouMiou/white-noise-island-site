@@ -1,3 +1,4 @@
+// 檔案路徑：app/loading.tsx
 // 全域 loading 組件
 export default function Loading() {
   return (

@@ -1,4 +1,5 @@
 'use client'
+// 檔案路徑：components/BannerCarousel.tsx
 
 import Link from 'next/link'
 import Image from 'next/image'

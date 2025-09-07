@@ -1,3 +1,4 @@
+// 檔案路徑：sanity.config.ts
 import {defineConfig} from 'sanity'
 import {deskTool} from 'sanity/desk'
 import {visionTool} from '@sanity/vision'

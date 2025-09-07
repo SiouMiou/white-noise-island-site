@@ -1,3 +1,4 @@
+// 檔案路徑：app/news/[slug]/page.tsx
 import Image from 'next/image'
 import Link from 'next/link'
 import {notFound} from 'next/navigation'

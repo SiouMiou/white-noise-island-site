@@ -1,3 +1,4 @@
+// 檔案路徑：lib/formatDate.ts
 // 時間格式化工具函數，統一使用台北時區
 export function formatTWT(iso: string) {
   return new Date(iso).toLocaleString('zh-TW', {

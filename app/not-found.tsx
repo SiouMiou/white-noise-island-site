@@ -1,3 +1,4 @@
+// 檔案路徑：app/not-found.tsx
 import Link from 'next/link'
 
 // 404 頁面

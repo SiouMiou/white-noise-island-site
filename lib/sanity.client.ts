@@ -1,3 +1,4 @@
+// 檔案路徑：lib/sanity.client.ts
 import {createClient} from 'next-sanity'
 
 // 檢查必要的環境變數

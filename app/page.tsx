@@ -1,14 +1,18 @@
+'use client'
+// 檔案路徑：app/page.tsx
+
 // app/page.tsx
 import Link from 'next/link'
 import Image from 'next/image'
+import { useEffect, useState } from 'react'
 import {sanityClient} from '../lib/sanity.client'
 import {urlFor} from '../lib/sanity.image'
 import {formatTWT} from '../lib/formatDate'
 import {getSiteSettings} from '../lib/siteSettings'
 import BannerCarousel from '../components/BannerCarousel'
 import LogoAnimation from '../components/LogoAnimation'
-
-export const revalidate = 60 // ISR：每 60 秒再驗證
+import LoadingAnimation from '../components/LoadingAnimation'
+import { useLoadingState } from '../hooks/useLoadingState'
 
 type NewsDoc = {
   _id: string
@@ -35,17 +39,35 @@ const latestNewsQuery = `*[_type == "news" && defined(slug.current) && published
     coverImage
   }`
 
-export default async function HomePage() {
-  let news: NewsDoc[] = []
-  let siteSettings = null
-  
-  try {
-    [news, siteSettings] = await Promise.all([
-      sanityClient.fetch<NewsDoc[]>(latestNewsQuery),
-      getSiteSettings()
-    ])
-  } catch (error) {
-    console.error('Failed to fetch data:', error)
+export default function HomePage() {
+  const { isLoading, isFirstLoad, completeLoading } = useLoadingState()
+  const [news, setNews] = useState<NewsDoc[]>([])
+  const [siteSettings, setSiteSettings] = useState<any>(null)
+  const [dataLoaded, setDataLoaded] = useState(false)
+
+  useEffect(() => {
+    // 載入資料
+    const loadData = async () => {
+      try {
+        const [newsData, settingsData] = await Promise.all([
+          sanityClient.fetch<NewsDoc[]>(latestNewsQuery),
+          getSiteSettings()
+        ])
+        setNews(newsData)
+        setSiteSettings(settingsData)
+        setDataLoaded(true)
+      } catch (error) {
+        console.error('Failed to fetch data:', error)
+        setDataLoaded(true)
+      }
+    }
+
+    loadData()
+  }, [])
+
+  // 如果正在載入且是首次載入，顯示載入動畫
+  if (isLoading && isFirstLoad) {
+    return <LoadingAnimation onComplete={completeLoading} />
   }
 
   const banners = (news ?? [])

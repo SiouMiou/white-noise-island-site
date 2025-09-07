@@ -1,3 +1,4 @@
+// 檔案路徑：lib/portableText.tsx
 import {PortableTextComponents} from '@portabletext/react'
 import {urlFor} from './sanity.image'
 import Image from 'next/image'

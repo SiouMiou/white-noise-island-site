@@ -1,4 +1,5 @@
 'use client'
+// 檔案路徑：app/error.tsx
 
 // 全域錯誤處理組件
 export default function Error({

@@ -1,3 +1,4 @@
+// 檔案路徑：lib/siteSettings.ts
 import {sanityClient} from './sanity.client'
 
 export type SiteSettings = {

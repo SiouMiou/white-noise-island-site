@@ -1,3 +1,4 @@
+// 檔案路徑：sanity/schemaTypes/news.ts
 import {defineType, defineField} from 'sanity'
 import {DocumentTextIcon} from '@sanity/icons'
 

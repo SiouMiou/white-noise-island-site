@@ -1,4 +1,5 @@
 'use client'
+// 檔案路徑：components/LogoAnimation.tsx
 
 import { useEffect, useState } from 'react'
 
