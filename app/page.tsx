@@ -86,12 +86,15 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <Link href="/" className="flex items-center gap-2 font-semibold text-gray-900 dark:text-white hover-float">
             <span className="sr-only">{siteSettings?.title || '白噪島'}</span>
-            {siteSettings?.favicon ? (
+            {siteSettings?.favicon?.asset?.url ? (
               <Image 
-                src={siteSettings.favicon.asset.url || '/favicon.ico'} 
+                src={siteSettings.favicon.asset.url} 
                 alt="" 
                 width={24} 
-                height={24} 
+                height={24}
+                onError={(e) => {
+                  e.currentTarget.src = '/favicon.ico'
+                }}
               />
             ) : (
               <Image src="/favicon.ico" alt="" width={24} height={24} />

@@ -42,7 +42,7 @@ export type SiteSettings = {
   }
 }
 
-const siteSettingsQuery = `*[_type == "siteSettings"] | order(_createdAt desc)[0]{
+const siteSettingsQuery = `*[_type == "siteSettings"] | order(_updatedAt desc)[0]{
   _id,
   name,
   title,
