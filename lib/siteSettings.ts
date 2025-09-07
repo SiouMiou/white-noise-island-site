@@ -16,6 +16,7 @@ export type SiteSettings = {
     asset: {
       _ref: string
       _type: string
+      url?: string
     }
   }
   defaultCoverImage?: {
@@ -44,7 +45,7 @@ const siteSettingsQuery = `*[_type == "siteSettings"][0]{
   description,
   useSvgAnimation,
   logo,
-  favicon,
+  favicon{asset->{_ref,_type,url}},
   defaultCoverImage,
   ogImage,
   contactEmail,
