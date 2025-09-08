@@ -86,19 +86,32 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <Link href="/" className="flex items-center gap-2 font-semibold text-gray-900 dark:text-white hover-float">
             <span className="sr-only">{siteSettings?.title || '白噪島'}</span>
-            <Image 
-              src={siteSettings?.favicon?.asset?.url || '/favicon.ico'} 
-              alt="" 
-              width={24} 
-              height={24}
-              onError={(e) => {
-                console.log('Favicon load error, falling back to /favicon.ico')
-                e.currentTarget.src = '/favicon.ico'
-              }}
-              onLoad={() => {
-                console.log('Favicon loaded successfully:', siteSettings?.favicon?.asset?.url || '/favicon.ico')
-              }}
-            />
+            {siteSettings?.favicon?.asset?.url ? (
+              <Image 
+                src={siteSettings.favicon.asset.url} 
+                alt="" 
+                width={24} 
+                height={24}
+                onError={(e) => {
+                  console.log('Favicon load error, falling back to /favicon.ico')
+                  console.log('SiteSettings favicon data:', siteSettings?.favicon)
+                  e.currentTarget.src = '/favicon.ico'
+                }}
+                onLoad={() => {
+                  console.log('Favicon loaded successfully:', siteSettings?.favicon?.asset?.url)
+                }}
+              />
+            ) : (
+              <Image 
+                src="/favicon.ico" 
+                alt="" 
+                width={24} 
+                height={24}
+                onError={(e) => {
+                  console.log('Default favicon also failed to load')
+                }}
+              />
+            )}
             <span>{siteSettings?.title || '白噪島'}</span>
           </Link>
           <nav className="flex items-center gap-6 text-sm">
