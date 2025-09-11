@@ -127,58 +127,66 @@ export default async function NewsPage({params}: {params: Promise<{slug: string}
   if (!data) return notFound()
 
   return (
-    <main className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
-      <header className="mb-8">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
-          {data.title}
-        </h1>
-        <time className="text-sm text-gray-500 dark:text-gray-400" dateTime={data.publishedAt}>
-          {formatTWT(data.publishedAt)}
-        </time>
-      </header>
+    <main className="min-h-screen" style={{ background: '#FAFBFF' }}>
+      <div className="mx-auto max-w-[720px] px-4 py-12">
+        <header className="mb-6">
+          <h1 className="text-[36px] leading-tight tracking-tight font-semibold text-[#1f2937]">
+            {data.title}
+          </h1>
+          <time className="mt-2 block text-[14px] text-[#6b7280]" dateTime={data.publishedAt}>
+            {formatTWT(data.publishedAt)}
+          </time>
+        </header>
 
-      {(data.coverImage || siteSettings?.defaultCoverImage) && (
-        <div className="my-8 rounded-lg overflow-hidden shadow-lg">
-          <Image
-            src={data.coverImage 
-              ? urlFor(data.coverImage).width(1200).height(630).fit('crop').url()
-              : urlFor(siteSettings!.defaultCoverImage!).width(1200).height(630).fit('crop').url()
-            }
-            alt={data.title}
-            width={1200}
-            height={630}
-            priority
-            className="w-full h-auto"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-          />
-        </div>
-      )}
+        {(data.coverImage || siteSettings?.defaultCoverImage) && (
+          <div className="my-8 rounded-2xl overflow-hidden shadow-[0_10px_20px_rgba(0,0,0,0.08)]">
+            <div className="relative w-full" style={{ aspectRatio: '1200/630' }}>
+              <Image
+                src={data.coverImage 
+                  ? urlFor(data.coverImage).width(1200).height(630).fit('crop').url()
+                  : urlFor(siteSettings!.defaultCoverImage!).width(1200).height(630).fit('crop').url()
+                }
+                alt={data.title}
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, 720px"
+                className="object-cover transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.02] motion-reduce:transition-none motion-reduce:transform-none"
+              />
+            </div>
+          </div>
+        )}
 
-      {data.excerpt && (
-        <div className="my-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border-l-4 border-blue-500">
-          <p className="text-lg text-gray-700 dark:text-gray-300 italic leading-relaxed">
-            {data.excerpt}
-          </p>
-        </div>
-      )}
+        {data.excerpt && (
+          <div className="my-6 p-4 bg-white rounded-xl border border-[var(--line)]">
+            <p className="text-[18px] leading-[1.8] text-[#1f2937]">
+              {data.excerpt}
+            </p>
+          </div>
+        )}
 
-      {data.body && (
-        <article className="prose prose-lg max-w-none dark:prose-invert">
-          <PortableText value={data.body} components={ptComponents} />
-        </article>
-      )}
+        {data.body && (
+          <article className="max-w-none">
+            <PortableText value={data.body} components={ptComponents} />
+          </article>
+        )}
 
-      <nav className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
-        <Link 
-          href="/" 
-          className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium transition-colors"
-        >
-          <svg className="mr-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          回到首頁
-        </Link>
-      </nav>
+        <nav className="mt-12 pt-8 border-t border-gray-200">
+          <div className="flex items-center justify-between text-[14px]">
+            <Link 
+              href="/news" 
+              className="text-[var(--brand)] hover:underline transition-[color,opacity]"
+            >
+              ← 返回最新消息
+            </Link>
+            <Link 
+              href="/news" 
+              className="text-[var(--brand)] hover:underline transition-[color,opacity]"
+            >
+              下一則 →
+            </Link>
+          </div>
+        </nav>
+      </div>
     </main>
   )
 }

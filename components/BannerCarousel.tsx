@@ -64,7 +64,7 @@ export default function BannerCarousel({
           <Link
             key={item.href}
             href={item.href}
-            className="absolute inset-0 hover-bright"
+            className="absolute inset-0 hover-bright group"
             aria-hidden={i !== index}
             tabIndex={i === index ? 0 : -1}
             style={{
@@ -73,14 +73,17 @@ export default function BannerCarousel({
             }}
           >
             <span className="sr-only">{item.title}</span>
-            <Image
-              src={item.imageUrl}
-              alt={item.title}
-              fill
-              sizes="(max-width: 768px) 100vw, 1200px"
-              priority={i === 0}
-              style={{ objectFit: 'cover' }}
-            />
+            <div className="absolute inset-0 overflow-hidden">
+              <Image
+                src={item.imageUrl}
+                alt={item.title}
+                fill
+                sizes="(max-width: 768px) 100vw, 1200px"
+                priority={i === 0}
+                className="transition-transform duration-300 ease-out group-hover:scale-[1.03]"
+                style={{ objectFit: 'cover' }}
+              />
+            </div>
           </Link>
         ))}
       </div>

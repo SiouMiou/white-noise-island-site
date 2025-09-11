@@ -13,6 +13,7 @@ import type { SiteSettings } from '../lib/siteSettings'
 import BannerCarousel from '../components/BannerCarousel'
 import LogoAnimation from '../components/LogoAnimation'
 import LoadingAnimation from '../components/LoadingAnimation'
+import BackgroundMarquee from '../components/BackgroundMarquee'
 import { useLoadingState } from '../hooks/useLoadingState'
 
 type NewsDoc = {
@@ -80,7 +81,7 @@ export default function HomePage() {
     }))
 
   return (
-    <main className="min-h-screen" style={{ background: 'linear-gradient(135deg, #FFF 0%, #FAFBFF 60%, #FFEDF3 100%)' }}>
+    <main className="min-h-screen relative" style={{ background: 'linear-gradient(135deg, #FFF 0%, #FAFBFF 60%, #FFEDF3 100%)' }}>
       {/* 站點導覽（簡易） */}
       <header className="sticky top-0 z-50 border-b bg-white/70 dark:bg-gray-900/70 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
@@ -123,8 +124,10 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* 1) 首屏：大型 GIF LOGO 動畫 */}
-      <section className="relative isolate">
+      {/* 主要內容區域 */}
+      <div className="relative z-10">
+        {/* 1) 首屏：大型 GIF LOGO 動畫 */}
+        <section className="relative isolate">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:py-14">
           <div className="relative overflow-hidden rounded-2xl border bg-white dark:bg-gray-800 shadow-lg card">
             {/* 品牌 LOGO 動畫 */}
@@ -184,15 +187,24 @@ export default function HomePage() {
               : null
 
             return (
-              <li key={item._id} className="group overflow-hidden rounded-xl border bg-white dark:bg-gray-800 shadow-sm transition-all hover:shadow-md card">
-                <Link href={`/news/${item.slug.current}`} className="block hover-bright">
+              <li
+                key={item._id}
+                className="group overflow-hidden rounded-2xl border bg-white dark:bg-gray-800 shadow-sm transition-all hover:shadow-md card
+                focus-within:shadow-md hover:border-[rgba(255,90,140,0.2)] focus-within:border-[rgba(255,90,140,0.2)]
+                transform-gpu will-change-transform origin-center transition-transform duration-[2000ms] ease-[cubic-bezier(0.19,1,0.22,1)]
+                hover:scale-[1.04] focus-within:scale-[1.04]
+                motion-reduce:transition-none motion-reduce:transform-none"
+              >
+                <Link href={`/news/${item.slug.current}`} className="block hover-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]/40 rounded-2xl">
                   {cover && (
-                    <div className="relative h-44 w-full">
+                    <div className="relative h-44 w-full overflow-hidden">
                       <Image
                         src={cover}
                         alt={item.title}
                         fill
                         sizes="(max-width: 768px) 100vw, 50vw"
+                        className="transition-transform duration-[2000ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.25] group-focus-visible:scale-[1.25] origin-center will-change-transform
+                        motion-reduce:transition-none motion-reduce:transform-none"
                         style={{ objectFit: 'cover' }}
                       />
                     </div>
@@ -218,9 +230,13 @@ export default function HomePage() {
           })}
         </ul>
       </section>
+      </div>
+
+      {/* 背景滾動區塊 - 在主要內容與 Footer 之間 */}
+      <BackgroundMarquee text="WHITE NOISE ISLAND" />
 
       {/* 底部社群／聯絡（簡易） */}
-      <footer className="border-t bg-white dark:bg-gray-800 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+      <footer className="relative z-10 border-t bg-white dark:bg-gray-800 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
         <div className="mx-auto max-w-6xl px-4">
           <div className="flex items-center justify-center gap-6">
             <Link 

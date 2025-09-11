@@ -176,3 +176,9 @@ h1, h2, h3, h4, h5, h6 {
   background-color: transparent;
   padding: 0;
 }
+
+/* 背景滾動動畫 */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
