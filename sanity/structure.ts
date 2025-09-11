@@ -12,12 +12,16 @@ export const structure: StructureResolver = (S, {currentUser}) => {
       .schemaType('news')
       .child(S.documentTypeList('news').title('最新消息')),
 
-    // 網站設定 - 改為列表形式，像最新消息一樣
-    S.listItem()
-      .id('siteSettings')
-      .title('網站設定')
-      .schemaType('siteSettings')
-      .child(S.documentTypeList('siteSettings').title('網站設定')),
+    // 網站設定：僅管理者可見
+    ...(isAdmin
+      ? [
+          S.listItem()
+            .id('siteSettings')
+            .title('網站設定')
+            .schemaType('siteSettings')
+            .child(S.documentTypeList('siteSettings').title('網站設定')),
+        ]
+      : []),
   ])
 }
 
